@@ -1,0 +1,84 @@
+Authors: Shikang Zheng and Edward Lee
+
+Secure cloud storage
+
+
+The PEM password for both client and server is: password
+
+
+List of Files:
+Makefile
+server/
+client/
+storage/
+scripts/
+presentation
+source files
+
+
+Makefile:
+A simple makefile that will compile the programs for you. Running the
+following commands will perform the following actions:
+make	    #builds the client and the server executables
+make server #builds the server executable (for portability)
+make client #builds the client executable (for portability)
+
+
+server/
+The server directory contains files needed by the server executable. They
+include the server certificate, server private key, and client certificate
+authority.
+
+
+client/
+The client directory contains files needed by the client executable. They
+include the client certificate, client private key, server certificate
+authority, and source code for cross platform dialogs.
+
+
+storage/
+The storage directory is where the cloud server will put the uploaded files.
+This can be modified by changing the S_DIR macro in the server source.
+
+
+scripts/
+The scripts directory contains a BASH script to generate self-signed
+certificates. Normally it is not okay to use self-signed certificates, but
+in this case it is okay because we know that we are the ones who are signing
+it.
+To run the script:
+./Lee-Zheng-crt.sh <name>
+
+
+Running the programs:
+After compiling and building from source, there will be two executables:
+Lee-Zheng-server and Lee-Zheng-client.
+To run the server: ./Lee-Zheng-server <port>
+To run the client: ./Lee-Zheng-client <hostname:port>
+(It will display this if it receives invalid arguments)
+
+After running the server and connecting to it via the client, the following
+prompt will be displayed:
+o - options
+u - upload
+d - download
+l - list
+r - remove
+q - quit
+
+o   will list these options again
+u   will open a prompt when a file can be selected to upload
+d   will list the files stored on the server and allow you to choose a file	to download
+l   will list the files stored on the server (will not show hidden files)
+r   will list the files stored on the server and allow you to choose a file	to remove from the server
+
+
+How it works:
+The client and server exchange certificates to set up a TLS connection. If
+either provides no certificate or an invalid certificate, the connection
+will be dropped. The certificates are password protected so even if someone
+were to gain access to them, they would not be able to use them. We use the
+ECDHE_ECDSA_AES_128_GCM_SHA256 cipher suite, which is the same scheme that
+Google Drive uses, to encrypt the data. To ensure that someone with access
+to the server cannot view the data, we use client-sided AES_128_GCM for
+encryption and integrity.
